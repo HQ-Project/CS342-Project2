@@ -138,15 +138,19 @@ int main(int argc, char *argv[])
             responseCount[curBurst->id]++;
         }
 
-        if(curBurst->last == 1) usleep(curBurst->burstTime * 1000);
-        else usleep(data.quantum * 1000);
+        if (curBurst->last == 1)
+            usleep(curBurst->burstTime * 1000);
+        else
+            usleep(data.quantum * 1000);
         //writeOutput(fp, (exeTime.tv_sec - startTime.tv_sec) * 1000000 + (exeTime.tv_usec - startTime.tv_usec), curBurst->burstTime, curBurst->id);
 
-        if (curBurst->last == 1){ //if (flag == 0)
+        if (curBurst->last == 1)
+        { //if (flag == 0)
             pthread_cond_signal(&(threadParams[curBurst->id].cond));
             writeOutput(fp, (exeTime.tv_sec - startTime.tv_sec) * 1000000 + (exeTime.tv_usec - startTime.tv_usec), curBurst->burstTime, curBurst->id);
         }
-        else{
+        else
+        {
             addNode(readyQueue, curBurst->id, curBurst->burstTime - data.quantum, 0);
             writeOutput(fp, (exeTime.tv_sec - startTime.tv_sec) * 1000000 + (exeTime.tv_usec - startTime.tv_usec), data.quantum, curBurst->id);
         }
@@ -155,7 +159,8 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < threadCount; i++)
     {
-        pthread_join(threadParams[i].tid, NULL);
+        pthread_cond_signal(&(threadParams[i].cond));
+        //pthread_join(threadParams[i].tid, NULL);
         if (responseCount[i] > 0)
         {
             printf("Statistics for process: %d\n", i + 1);
